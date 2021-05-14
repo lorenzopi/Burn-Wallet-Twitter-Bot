@@ -123,7 +123,7 @@ def burn_update(connection):
 
 def burn_tweet_text(date_diff,supply_diff_formatted,last_price,dollar_value_delta_formatted):
 
-    burn_tweet=f"{dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff}. {supply_diff_formatted} tokens at {last_price} price)"
+    burn_tweet=f"{dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff}. ({supply_diff_formatted} tokens at {last_price} price)"
 
     return burn_tweet
 
