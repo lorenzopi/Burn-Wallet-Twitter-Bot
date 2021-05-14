@@ -94,16 +94,14 @@ def percent_tweet_text(supply_api, price_api):
     return {'tweet_text': tweet_text, 'token_price': token_price, 'burned_supply': burned_supply}
 
 
-
-
 def add_tweet_record(connection, burned_supply, token_price):
 
     cursor.execute("INSERT INTO history (date, token_supply, price) VALUES (?, ?, ?)", (datetime.now(), burned_supply, token_price))
     connection.commit()
-    cursor.close()
-
+ 
 def burn_update(connection):
 
+    cursor = connection.cursor()
     latest_record = connection.execute("SELECT * FROM history ORDER BY date DESC LIMIT 1;").fetchall()
     previous_record = connection.execute("SELECT * FROM history ORDER BY date DESC LIMIT 1 OFFSET 1;").fetchall()
     date_diff = humanize.naturaldelta(datetime.strptime(latest_record[0][0], '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(previous_record[0][0], '%Y-%m-%d %H:%M:%S.%f'))
@@ -113,9 +111,6 @@ def burn_update(connection):
     last_price = "{:.8f}".format(float(latest_record[0][2]))
     dollar_value_delta = float(last_price) * float(supply_diff)
     dollar_value_delta_formatted = "${:0,.0f}".format(math.trunc(dollar_value_delta))
-
-    cursor.close()
-    connection.close()
 
     return {'date_diff': date_diff,'supply_diff_formatted': supply_diff_formatted, 'last_price': last_price, 'dollar_value_delta_formatted': dollar_value_delta_formatted}
 
