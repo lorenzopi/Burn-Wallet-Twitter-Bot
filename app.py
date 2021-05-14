@@ -89,10 +89,8 @@ def percent_tweet_text(supply_api, price_api):
     token_price = "{:.10f}".format(float(price_response['market_data']['current_price']['usd']))
 
     tweet_text = ("{:.4%}".format(burned_supply_percentage) + 
-            " of Safemoon supply has been sent to burn wallet. " +
-            token_price +
-            " is the token price."
-            )
+            " of Safemoon supply has been sent to burn wallet. ")
+
     return {'tweet_text': tweet_text, 'token_price': token_price, 'burned_supply': burned_supply}
 
 
