@@ -127,35 +127,31 @@ def burn_time_tweet(supply_burned, time_elapsed, total_burned):
 
     return burn_time
 
-while 1:
+
+# build first tweet with % sent to burn wallet
+
+tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
+
+# add stats to db
+
+add_tweet_record(connection, tweet_body['burned_supply'], tweet_body['token_price'])
+
+# build second tweet with burn stats
+
+burn_tweet_body = burn_update(connection)
+
+# build third tweet with burn time to 0
+
+burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
+
+#print(tweet_body['tweet_text'])
+#print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
+#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
+
+post_tweet(tweet_body['tweet_text'])
+post_tweet(burn_tweet_text(burn_tweet_body['date_diff'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
+post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
     
-    # build first tweet with % sent to burn wallet
-    tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
+print("Current date and time: ", str(datetime.now()))
 
-    # add stats to db
-    add_tweet_record(connection, tweet_body['burned_supply'], tweet_body['token_price'])
-
-    # build second tweet with burn stats
-    burn_tweet_body = burn_update(connection)
-
-
-    print(tweet_body['tweet_text'])
-    print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-    
-    burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
-    
-    print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
-
-    post_tweet(tweet_body['tweet_text'])
-    post_tweet(burn_tweet_text(burn_tweet_body['date_diff'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-    post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
-    
-    
-    print("Current date and time: ", str(datetime.now()))
-
-    logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
-    dt = datetime.now() + timedelta(hours=4)
-    dt = dt.replace(minute=0)
-
-    while datetime.now() < dt:
-        time.sleep(1)
+logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
