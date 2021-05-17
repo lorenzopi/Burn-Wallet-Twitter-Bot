@@ -152,3 +152,5 @@ post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_
 print("Current date and time: ", str(datetime.now()))
 
 logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
+
+exit()
