@@ -122,7 +122,9 @@ def burn_time_tweet(supply_burned, time_elapsed, total_burned):
 
     burn_time = (TOTAL_SUPPLY - total_burned) / supply_burned * time_elapsed.total_seconds()
 
-    return burn_time
+    time_to_one_trillion = 1000000000000 / supply_burned * time_elapsed
+
+    return {'burn_time': burn_time, 'time_to_one_trillion': time_to_one_trillion}
 
 
 # build first tweet with % sent to burn wallet
@@ -141,14 +143,29 @@ burn_tweet_body = burn_update(connection)
 
 burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
 
+# multiline tweet
+
+with open('temp.txt', 'w') as f:
+   f.write('Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
+            'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
+            'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
+
+with open('temp.txt','r') as f:
+    time_to_burn_tweet = f.read()
+    
+
+#print(time_to_burn_tweet)
 #print(tweet_body['tweet_text'])
 #print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn Safemoon supply to 0')
+#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply')
+
+
 
 post_tweet(tweet_body['tweet_text'])
 post_tweet(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn Safemoon supply to 0')
-    
+post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn circulating Safemoon supply (theoretically)')
+post_tweet(time_to_burn_tweet)
+
 print("Current date and time: ", str(datetime.now()))
 
 logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
