@@ -1,10 +1,7 @@
 from decouple import config
-from requests.api import post
 import tweepy
-from tweepy.auth import OAuthHandler
 import requests
-import time
-from datetime import timedelta, datetime
+from datetime import datetime
 import logging
 import sqlite3
 import math
@@ -146,11 +143,11 @@ burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet
 
 #print(tweet_body['tweet_text'])
 #print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
+#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn Safemoon supply to 0')
 
 post_tweet(tweet_body['tweet_text'])
 post_tweet(burn_tweet_text(burn_tweet_body['date_diff'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
+post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn Safemoon supply to 0')
     
 print("Current date and time: ", str(datetime.now()))
 
