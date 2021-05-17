@@ -1,4 +1,5 @@
 from decouple import config
+from requests.api import post
 import tweepy
 from tweepy.auth import OAuthHandler
 import requests
@@ -101,10 +102,10 @@ def add_tweet_record(connection, burned_supply, token_price):
  
 def burn_update(connection):
 
-    cursor = connection.cursor()
     latest_record = connection.execute("SELECT * FROM history ORDER BY date DESC LIMIT 1;").fetchall()
     previous_record = connection.execute("SELECT * FROM history ORDER BY date DESC LIMIT 1 OFFSET 1;").fetchall()
-    date_diff = humanize.naturaldelta(datetime.strptime(latest_record[0][0], '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(previous_record[0][0], '%Y-%m-%d %H:%M:%S.%f'))
+    date_diff = datetime.strptime(latest_record[0][0], '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(previous_record[0][0], '%Y-%m-%d %H:%M:%S.%f')
+    date_diff_formatted = humanize.naturaldelta(date_diff)
     supply_diff = float(latest_record[0][1]) - float(previous_record[0][1])
     supply_diff_formatted = "{:,}".format(math.trunc(supply_diff))
     #price_diff = float(latest_record[0][2]) - float(previous_record[0][2])
@@ -112,13 +113,19 @@ def burn_update(connection):
     dollar_value_delta = float(last_price) * float(supply_diff)
     dollar_value_delta_formatted = "${:0,.0f}".format(math.trunc(dollar_value_delta))
 
-    return {'date_diff': date_diff,'supply_diff_formatted': supply_diff_formatted, 'last_price': last_price, 'dollar_value_delta_formatted': dollar_value_delta_formatted}
+    return {'date_diff': date_diff, 'date_diff_formatted': date_diff_formatted,'supply_diff': supply_diff,'supply_diff_formatted': supply_diff_formatted, 'last_price': last_price, 'dollar_value_delta_formatted': dollar_value_delta_formatted}
 
-def burn_tweet_text(date_diff,supply_diff_formatted,last_price,dollar_value_delta_formatted):
+def burn_tweet_text(date_diff_formatted,supply_diff_formatted,last_price,dollar_value_delta_formatted):
 
-    burn_tweet=f"{dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff}. ({supply_diff_formatted} tokens at {last_price} price)"
+    burn_tweet=f"{dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff_formatted}. ({supply_diff_formatted} tokens at {last_price} price)"
 
     return burn_tweet
+
+def burn_time_tweet(supply_burned, time_elapsed, total_burned):
+
+    burn_time = (TOTAL_SUPPLY - total_burned) / supply_burned * time_elapsed.total_seconds()
+
+    return burn_time
 
 while 1:
     
@@ -133,10 +140,17 @@ while 1:
 
 
     print(tweet_body['tweet_text'])
-    print(burn_tweet_text(burn_tweet_body['date_diff'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
+    print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
     
+    burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
+    
+    print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
+
     post_tweet(tweet_body['tweet_text'])
     post_tweet(burn_tweet_text(burn_tweet_body['date_diff'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
+    post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn safemoon supply to 0')
+    
+    
     print("Current date and time: ", str(datetime.now()))
 
     logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
