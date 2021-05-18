@@ -163,7 +163,7 @@ with open('temp.txt','r') as f:
 
 post_tweet(tweet_body['tweet_text'])
 post_tweet(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn circulating Safemoon supply (theoretically)')
+post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body) + ' to burn circulating Safemoon supply, theoretically')
 post_tweet(time_to_burn_tweet)
 
 print("Current date and time: ", str(datetime.now()))
