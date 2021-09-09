@@ -6,8 +6,7 @@ import logging
 import sqlite3
 import math
 import humanize
-
-# sqlite
+import time
 
 connection = sqlite3.connect('records.db')
 
@@ -19,6 +18,7 @@ ACCESS_TOKEN = config('ACCESS_TOKEN')
 ACCESS_SECRET = config('ACCESS_SECRET')
 CONSUMER_KEY = config('CONSUMER_KEY')
 CONSUMER_SECRET = config('CONSUMER_SECRET')
+BEARER_TOKEN = config('BEARER_TOKEN')
 
 # bscscan API
 
@@ -59,24 +59,28 @@ coingecko_endpoint = ('https://api.coingecko.com/api/v3/coins/safemoon?market_da
 
 # tweepy posting
 
-def post_tweet(tweet_body):
+def post_tweet(tweet_body, **kwargs):
         
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
     
     api = tweepy.API(auth)
+
+    try:
+        try:
+            api.update_status(tweet_body, in_reply_to_status_id = kwargs)      
+        except tweepy.TweepError:
+            print('Duplicate Post')
+
+    except:
+        try:
+            api.update_status(tweet_body)  
+        except tweepy.TweepError:
+            print('Duplicate Post')
+
+    kwargs = id
+    return id
     
-    try:
-        redirect_url = auth.get_authorization_url()
-    except tweepy.TweepError:
-        print('Error! Failed to get request token.')
-
-    try:
-        api.update_status(tweet_body)    
-    except tweepy.TweepError:
-        print('Duplicate Post')
-
-
 def percent_tweet_text(supply_api, price_api):
 
     supply_response = requests.get(supply_api).json()
@@ -105,7 +109,6 @@ def burn_update(connection):
     date_diff_formatted = humanize.naturaldelta(date_diff)
     supply_diff = float(latest_record[0][1]) - float(previous_record[0][1])
     supply_diff_formatted = "{:,}".format(math.trunc(supply_diff))
-    #price_diff = float(latest_record[0][2]) - float(previous_record[0][2])
     last_price = "{:.8f}".format(float(latest_record[0][2]))
     dollar_value_delta = float(last_price) * float(supply_diff)
     dollar_value_delta_formatted = "${:0,.0f}".format(math.trunc(dollar_value_delta))
@@ -114,7 +117,7 @@ def burn_update(connection):
 
 def burn_tweet_text(date_diff_formatted,supply_diff_formatted,last_price,dollar_value_delta_formatted):
 
-    burn_tweet=f"{dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff_formatted}. ({supply_diff_formatted} tokens at {last_price} price)"
+    burn_tweet=f"{'@safemoonburned ' + dollar_value_delta_formatted} in Safemoon tokens have been burned in the last {date_diff_formatted}. ({supply_diff_formatted} tokens at {last_price} price)"
 
     return burn_tweet
 
@@ -127,7 +130,26 @@ def burn_time_tweet(supply_burned, time_elapsed, total_burned):
     return {'burn_time': burn_time, 'time_to_one_trillion': time_to_one_trillion}
 
 
-# build first tweet with % sent to burn wallet
+
+
+    #
+    # "meta" "newest_id": "1435743065302573056",
+
+
+def get_latest_tweet_id():
+
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+
+    url = "https://api.twitter.com/2/tweets/search/recent?query=from:safemoonburned&"
+    payload={}
+    headers = {
+    'Authorization': 'Bearer '+ BEARER_TOKEN
+    }
+    response = requests.request("GET", url, headers=headers, data=payload).json()
+
+    return response["meta"]["newest_id"]
+
 
 tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
 
@@ -146,7 +168,7 @@ burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet
 # multiline tweet
 
 with open('temp.txt', 'w') as f:
-   f.write('Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
+   f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
             'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
             'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
 
@@ -154,17 +176,18 @@ with open('temp.txt','r') as f:
     time_to_burn_tweet = f.read()
     
 
-#print(time_to_burn_tweet)
-#print(tweet_body['tweet_text'])
-#print(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-#print('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)')
+tweet1_body = tweet_body['tweet_text']
+tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
+tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
+tweet4_body = time_to_burn_tweet
 
-
-
-post_tweet(tweet_body['tweet_text'])
-post_tweet(burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted']))
-post_tweet('At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)')
-post_tweet(time_to_burn_tweet)
+tweet1 = post_tweet(tweet1_body)
+time.sleep(15)
+tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+time.sleep(15)
+tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+time.sleep(15)
+tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
 
 print("Current date and time: ", str(datetime.now()))
 
