@@ -95,7 +95,6 @@ def percent_tweet_text(supply_api, price_api):
 
     return {'tweet_text': tweet_text, 'token_price': token_price, 'burned_supply': burned_supply}
 
-
 def add_tweet_record(connection, burned_supply, token_price):
 
     cursor.execute("INSERT INTO history (date, token_supply, price) VALUES (?, ?, ?)", (datetime.now(), burned_supply, token_price))
@@ -135,7 +134,6 @@ def burn_time_tweet(supply_burned, time_elapsed, total_burned):
     #
     # "meta" "newest_id": "1435743065302573056",
 
-
 def get_latest_tweet_id():
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -151,46 +149,48 @@ def get_latest_tweet_id():
     return response["meta"]["newest_id"]
 
 
-tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
+def tweet_loop():
 
-# add stats to db
+    tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
 
-add_tweet_record(connection, tweet_body['burned_supply'], tweet_body['token_price'])
+    # add stats to db
 
-# build second tweet with burn stats
+    add_tweet_record(connection, tweet_body['burned_supply'], tweet_body['token_price'])
 
-burn_tweet_body = burn_update(connection)
+    # build second tweet with burn stats
 
-# build third tweet with burn time to 0
+    burn_tweet_body = burn_update(connection)
 
-burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
+    # build third tweet with burn time to 0
 
-# multiline tweet
+    burn_time_tweet_body = burn_time_tweet(burn_tweet_body['supply_diff'],burn_tweet_body['date_diff'],tweet_body['burned_supply'])
 
-with open('temp.txt', 'w') as f:
-   f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
-            'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
-            'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
+    # multiline tweet
 
-with open('temp.txt','r') as f:
-    time_to_burn_tweet = f.read()
-    
+    with open('temp.txt', 'w') as f:
+    f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
+                'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
+                'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
 
-tweet1_body = tweet_body['tweet_text']
-tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
-tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
-tweet4_body = time_to_burn_tweet
+    with open('temp.txt','r') as f:
+        time_to_burn_tweet = f.read()
+        
 
-tweet1 = post_tweet(tweet1_body)
-time.sleep(15)
-tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
-time.sleep(15)
-tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
-time.sleep(15)
-tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    tweet1_body = tweet_body['tweet_text']
+    tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
+    tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
+    tweet4_body = time_to_burn_tweet
 
-print("Current date and time: ", str(datetime.now()))
+    tweet1 = post_tweet(tweet1_body)
+    time.sleep(15)
+    tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    time.sleep(15)
+    tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    time.sleep(15)
+    tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
 
-logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
+    print("Current date and time: ", str(datetime.now()))
+
+    logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
 
 exit()
