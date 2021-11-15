@@ -148,7 +148,6 @@ def get_latest_tweet_id():
 
     return response["meta"]["newest_id"]
 
-
 def tweet_loop():
 
     tweet_body = percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint)
@@ -168,7 +167,7 @@ def tweet_loop():
     # multiline tweet
 
     with open('temp.txt', 'w') as f:
-    f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
+        f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
                 'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
                 'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
 
@@ -192,5 +191,7 @@ def tweet_loop():
     print("Current date and time: ", str(datetime.now()))
 
     logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
+
+tweet_loop()
 
 exit()
