@@ -179,10 +179,6 @@ def tweet_loop():
     time.sleep(15)
     tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
 
-    print("Current date and time: ", str(datetime.now()))
-
-    logger.info(percent_tweet_text(bsc_scan_endpoint,coingecko_endpoint))
-
 tweet_loop()
 
 exit()
