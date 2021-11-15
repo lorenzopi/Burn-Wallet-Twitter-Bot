@@ -2,7 +2,6 @@ from decouple import config
 import tweepy
 import requests
 from datetime import datetime
-import logging
 import sqlite3
 import math
 import humanize
@@ -23,14 +22,6 @@ BEARER_TOKEN = config('BEARER_TOKEN')
 # bscscan API
 
 BSC_API_KEY = config('BSC_API_KEY')
-
-# logging
-
-logging.basicConfig(filename="log.log", 
-					format='%(asctime)s %(message)s', 
-					filemode='w') 
-logger=logging.getLogger()
-logger.setLevel(logging.DEBUG) 
 
 # token address for safemoon
 
