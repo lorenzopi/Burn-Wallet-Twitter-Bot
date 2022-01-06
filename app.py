@@ -167,9 +167,9 @@ def tweet_loop():
         
 
     tweet1_body = tweet_body['tweet_text']
-    tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
+    #tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
     #tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
-    tweet4_body = time_to_burn_tweet
+    #tweet4_body = time_to_burn_tweet
 
     tweet1 = post_tweet(tweet1_body)
     time.sleep(15)
