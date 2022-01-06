@@ -46,7 +46,7 @@ bsc_scan_endpoint = ('https://api.bscscan.com/api?module=account&action=tokenbal
 
 # coingecko token price
 
-coingecko_endpoint = ('https://api.coingecko.com/api/v3/coins/safemoon?market_data=true')
+coingecko_endpoint = ('https://api.coingecko.com/api/v3/coins/safemoon-2?market_data=true')
 
 # tweepy posting
 
@@ -157,27 +157,27 @@ def tweet_loop():
 
     # multiline tweet
 
-    with open('temp.txt', 'w') as f:
-        f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
-                'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
-                'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
+    #with open('temp.txt', 'w') as f:
+    #    f.write('@safemoonburned Time to burn 1T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']) + '\n' +
+    #            'Time to burn 10T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*10) + '\n' +
+    #            'Time to burn 100T Safemoon: ' + humanize.precisedelta(burn_time_tweet_body['time_to_one_trillion']*100) + '\n')
 
-    with open('temp.txt','r') as f:
-        time_to_burn_tweet = f.read()
+    #with open('temp.txt','r') as f:
+    #    time_to_burn_tweet = f.read()
         
 
     tweet1_body = tweet_body['tweet_text']
     tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
-    tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
+    #tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
     tweet4_body = time_to_burn_tweet
 
     tweet1 = post_tweet(tweet1_body)
     time.sleep(15)
-    tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
-    time.sleep(15)
-    tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
-    time.sleep(15)
-    tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    #tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    #time.sleep(15)
+    #tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    #time.sleep(15)
+    #tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
 
 tweet_loop()
 
