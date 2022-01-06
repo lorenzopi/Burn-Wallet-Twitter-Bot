@@ -25,7 +25,7 @@ BSC_API_KEY = config('BSC_API_KEY')
 
 # token address for safemoon
 
-TOKEN_ADDRESS = '0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3'
+TOKEN_ADDRESS = '0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5'
 
 # safemoon burn wallet address 
 
@@ -33,7 +33,7 @@ BURN_WALLET_ADDRESS = '0x0000000000000000000000000000000000000001'
 
 # total safemoon supply
 
-TOTAL_SUPPLY = 1000000000000000 
+TOTAL_SUPPLY = 1000000000000 
 
 # bscscan wallet total
 
