@@ -119,12 +119,6 @@ def burn_time_tweet(supply_burned, time_elapsed, total_burned):
 
     return {'burn_time': burn_time, 'time_to_one_trillion': time_to_one_trillion}
 
-
-
-
-    #
-    # "meta" "newest_id": "1435743065302573056",
-
 def get_latest_tweet_id():
 
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -167,15 +161,15 @@ def tweet_loop():
         
 
     tweet1_body = tweet_body['tweet_text']
-    #tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
-    #tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply (theoretically, supply will not go to 0)'
+    tweet2_body = burn_tweet_text(burn_tweet_body['date_diff_formatted'], burn_tweet_body['supply_diff_formatted'], burn_tweet_body['last_price'], burn_tweet_body['dollar_value_delta_formatted'])
+    tweet3_body = '@safemoonburned At this rate it will take ' + humanize.precisedelta(burn_time_tweet_body['burn_time']) + ' to burn Safemoon supply'
     #tweet4_body = time_to_burn_tweet
 
     tweet1 = post_tweet(tweet1_body)
     time.sleep(15)
-    #tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
-    #time.sleep(15)
-    #tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    tweet2 = post_tweet(tweet2_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
+    time.sleep(15)
+    tweet3 = post_tweet(tweet3_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
     #time.sleep(15)
     #tweet4 = post_tweet(tweet4_body,in_reply_to_status_id=get_latest_tweet_id(), auto_populate_reply_metadata=True)
 
